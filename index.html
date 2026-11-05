@@ -1,0 +1,62 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dead Echoes GM Ambience Mixer · Dojo Studios</title>
+<meta name="theme-color" content="#0b0a10">
+<link rel="icon" href="data:,">
+<style>
+@font-face{font-family:P;src:url(img/PressStart2P-Regular.ttf)}@font-face{font-family:V;src:url(img/VT323-Regular.ttf)}
+*{box-sizing:border-box}body{margin:0;background:#0b0a10;color:#e8dcc0;font:20px V,monospace;-webkit-text-size-adjust:100%}
+header{background:url(img/bg.png) center/cover;image-rendering:pixelated;padding:28px 16px 22px;text-align:center;border-bottom:4px solid #6b1a1a;position:relative}
+header:before{content:"";position:absolute;inset:0;background:linear-gradient(#0b0a1055,#0b0a10ee)}
+header *{position:relative}h1{font:16px/1.5 P,monospace;color:#f2c45a;margin:0 0 6px;text-shadow:3px 3px #000}
+.sub{color:#9fd8e0}main{max-width:760px;margin:auto;padding:12px}
+#start{display:block;width:100%;font:14px P,monospace;padding:18px;background:#6b1a1a;color:#f2c45a;border:4px solid #f2c45a;box-shadow:4px 4px #000;margin:10px 0;cursor:pointer}
+.row{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;background:#16131d;border:3px solid #2c2638;padding:8px 10px;margin:8px 0}
+.row.on{border-color:#2fa3b3}.row b{font:10px P,monospace;color:#f2c45a}.row small{color:#8c8299}
+.tg{width:52px;height:52px;font:18px P,monospace;background:#241f2e;color:#e8dcc0;border:3px solid #4a4058;cursor:pointer}
+.on .tg{background:#2fa3b3;color:#0b0a10}
+input[type=range]{width:100%;height:32px;accent-color:#f2c45a}
+.presets{display:flex;flex-wrap:wrap;gap:6px}.presets button,.save button{font:10px P,monospace;padding:12px 10px;background:#241f2e;color:#e8dcc0;border:3px solid #4a4058;cursor:pointer}
+.save{display:flex;gap:6px;margin-top:8px}.save input{flex:1;min-width:0;font:20px V;background:#16131d;color:#e8dcc0;border:3px solid #4a4058;padding:6px}
+h2{font:11px P,monospace;color:#9fd8e0;margin:20px 0 8px}#mixes{display:flex;flex-wrap:wrap;gap:6px}
+.links a{display:block;margin:8px 0;padding:12px;background:#16131d;border:3px solid #6b1a1a;color:#f2c45a;text-decoration:none}
+#status{color:#8c8299;min-height:1.2em}
+footer{max-width:760px;margin:24px auto;padding:12px;color:#8c8299;font-size:17px;border-top:3px solid #2c2638}
+</style></head><body>
+<header><h1>DEAD ECHOES<br>AMBIENCE MIXER</h1><div class="sub">Layer dark-fantasy loops for your table · by Dojo Studios</div></header>
+<main>
+<button id="start">▶ TAP TO START AUDIO</button><div id="status"></div>
+<div class="row"><span>🔊</span><div><b>MASTER</b><input type="range" id="master" min="0" max="1" step="0.01" value="0.8" aria-label="Master volume"></div></div>
+<div id="layers"></div>
+<h2>SCENE PRESETS</h2><div class="presets" id="presets"></div>
+<h2>MY MIXES</h2><div class="save"><input id="mixname" placeholder="Name this mix" maxlength="30"><button id="savebtn">SAVE</button></div><div id="mixes"></div>
+<h2>SUPPORT &amp; MORE</h2><div class="links">
+<a id="kofi" href="#" data-todo="KOFI_URL_TBD">☕ Tip on Ko-fi (link coming soon)</a>
+<a href="https://dojostudios.gumroad.com/l/ktneso" target="_blank" rel="noopener">🎲 Dead Echoes Ambience — Foundry VTT module (Gumroad)</a>
+<a href="https://dojostudios.gumroad.com/l/pkawsb" target="_blank" rel="noopener">📜 Dead Echoes GM Kit (Gumroad)</a></div>
+</main>
+<footer><b>AI disclosure:</b> The music loops are instrumental tracks from Dead Echoes Ambience, generated with Suno AI from Dojo Studios' own prompts, then picked, trimmed, looped and loudness-matched by hand. The header art is AI-generated pixel-style art selected by Dojo Studios. The Rain and Wind layers are synthesized noise. Mixes are saved only in this browser (localStorage). © Dojo Studios.</footer>
+<script>
+const L=[["tavern","Echo Tavern","Tavern · rest & social"],["dungeon","Undercity","Dungeon delve"],["crypt","After the Death Save","Crypt · grief · aftermath"],["combat","Blades in the Rain","Combat"],["market","Whisper Market","Intrigue · heist"],["road","Lantern Road","Night travel"],["rain","Rain","Synth rain layer"],["wind","Wind & Stone","Low rumble / room tone"]];
+const P={"Tavern Night":{tavern:.8,rain:.35},"Dungeon Delve":{dungeon:.8,wind:.5},"Crypt":{crypt:.7,wind:.6,rain:.15},"Ambush!":{combat:.85,rain:.4},"Heist":{market:.75,rain:.25},"Road at Night":{road:.75,wind:.3,rain:.2}};
+let ctx,master,S={},buf={},started=false;const $=id=>document.getElementById(id);
+const st=$("status");
+L.forEach(([k,n,d])=>{const r=document.createElement("div");r.className="row";r.id="r-"+k;r.innerHTML=`<button class="tg" aria-label="Toggle ${n}">♪</button><div><b>${n.toUpperCase()}</b> <small>${d}</small><input type="range" min="0" max="1" step="0.01" value="0.7" aria-label="${n} volume"></div>`;$("layers").append(r);
+S[k]={on:false,vol:.7,row:r};r.querySelector(".tg").onclick=()=>setOn(k,!S[k].on);r.querySelector("input").oninput=e=>{S[k].vol=+e.target.value;apply(k)}});
+async function init(){if(ctx)return;ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=+$("master").value;master.connect(ctx.destination);
+// iOS unlock: play a silent buffer inside the tap
+const s=ctx.createBufferSource();s.buffer=ctx.createBuffer(1,1,22050);s.connect(ctx.destination);s.start(0);await ctx.resume();
+st.textContent="Loading loops…";let n=0;await Promise.all(L.map(async([k])=>{const a=await fetch("audio/"+k+".mp3").then(r=>{if(!r.ok)throw Error(k);return r.arrayBuffer()});buf[k]=await new Promise((ok,no)=>ctx.decodeAudioData(a,ok,no));S[k].g=ctx.createGain();S[k].g.gain.value=0;S[k].g.connect(master);const src=ctx.createBufferSource();src.buffer=buf[k];src.loop=true;src.connect(S[k].g);src.start();n++;st.textContent=`Loaded ${n}/${L.length}`}));
+st.textContent="Ready. Toggle layers or pick a scene.";started=true;window.__ready=true;Object.keys(S).forEach(apply)}
+function apply(k){const s=S[k];s.row.classList.toggle("on",s.on);s.row.querySelector("input").value=s.vol;if(s.g)s.g.gain.setTargetAtTime(s.on?s.vol:0,ctx.currentTime,.4)}
+function setOn(k,v){S[k].on=v;if(!ctx)init();apply(k)}
+$("start").onclick=async()=>{await init();$("start").textContent=ctx.state==="running"?"♪ AUDIO ON":"TAP AGAIN TO START"};
+$("master").oninput=e=>{if(master)master.gain.setTargetAtTime(+e.target.value,ctx.currentTime,.1)};
+function load(m){if(!ctx)init();for(const k in S){S[k].on=k in m;if(k in m)S[k].vol=m[k];apply(k)}}
+for(const n in P){const b=document.createElement("button");b.textContent=n.toUpperCase();b.onclick=()=>load(P[n]);$("presets").append(b)}
+const KEY="deadEchoesMixes";const get=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}};
+function draw(){const m=get();$("mixes").innerHTML="";for(const n in m){const b=document.createElement("button");b.className="";b.style.cssText="font:10px P,monospace;padding:12px 10px;background:#241f2e;color:#9fd8e0;border:3px solid #2fa3b3";b.textContent=n+" ✕";b.title="Tap to load, long-press/✕ via confirm to delete";b.onclick=()=>{if(confirm('Load "'+n+'"? (Cancel to delete)'))load(m[n]);else if(confirm('Delete "'+n+'"?')){delete m[n];localStorage.setItem(KEY,JSON.stringify(m));draw()}};$("mixes").append(b)}}
+$("savebtn").onclick=()=>{const n=$("mixname").value.trim()||"Mix "+(Object.keys(get()).length+1);const mix={};for(const k in S)if(S[k].on)mix[k]=S[k].vol;const m=get();m[n]=mix;localStorage.setItem(KEY,JSON.stringify(m));$("mixname").value="";draw()};draw();
+const KOFI_URL="";/* TODO: set Ko-fi URL; button stays hidden while empty */
+if(KOFI_URL){$("kofi").href=KOFI_URL;$("kofi").target="_blank";$("kofi").rel="noopener";$("kofi").textContent="☕ Tip on Ko-fi"}else{$("kofi").hidden=true}
+</script></body></html>
