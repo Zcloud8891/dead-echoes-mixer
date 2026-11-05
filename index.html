@@ -21,12 +21,17 @@ input[type=range]{width:100%;height:32px;accent-color:#f2c45a}
 h2{font:11px P,monospace;color:#9fd8e0;margin:20px 0 8px}#mixes{display:flex;flex-wrap:wrap;gap:6px}
 .links a{display:block;margin:8px 0;padding:12px;background:#16131d;border:3px solid #6b1a1a;color:#f2c45a;text-decoration:none}
 #status{color:#8c8299;min-height:1.2em}
+.scenes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.scenes button,#sting{font:11px P,monospace;min-height:56px;padding:10px 6px;background:#241f2e;color:#e8dcc0;border:3px solid #4a4058;cursor:pointer;touch-action:manipulation}.scenes button.act{border-color:#f2c45a;color:#f2c45a}#sting{display:block;width:100%;margin-top:8px;background:#3a2a0a;border-color:#f2c45a;color:#f2c45a}#sting:disabled{opacity:.5}.presets button,.save button{min-height:48px;touch-action:manipulation}.tg{touch-action:manipulation}kbd{font:12px V;color:#8c8299}.hint{color:#8c8299;font-size:17px;margin:6px 0}@media (hover:none){.hint{display:none}}
 footer{max-width:760px;margin:24px auto;padding:12px;color:#8c8299;font-size:17px;border-top:3px solid #2c2638}
 </style></head><body>
 <header><h1>DEAD ECHOES<br>AMBIENCE MIXER</h1><div class="sub">Layer dark-fantasy loops for your table · by Dojo Studios</div></header>
 <main>
 <button id="start">▶ TAP TO START AUDIO</button><div id="status"></div>
 <div class="row"><span>🔊</span><div><b>MASTER</b><input type="range" id="master" min="0" max="1" step="0.01" value="0.8" aria-label="Master volume"></div></div>
+<h2>SCENES</h2><div class="scenes" id="scenes"><button data-scene="Calm">CALM</button><button data-scene="Tension">TENSION</button><button data-scene="Combat">COMBAT</button></div>
+<button id="sting">🏆 VICTORY STING</button>
+<div class="row"><span>🔥</span><div><b>INTENSITY</b> <small id="ival">50</small><input type="range" id="intensity" min="0" max="100" step="1" value="50" aria-label="Intensity"></div></div>
+<div class="hint">Keys: <kbd>1</kbd> Calm · <kbd>2</kbd> Tension · <kbd>3</kbd> Combat · <kbd>V</kbd> Victory · <kbd>[</kbd>/<kbd>]</kbd> Intensity ∓10 · <kbd>Space</kbd> start audio</div>
 <div id="layers"></div>
 <h2>SCENE PRESETS</h2><div class="presets" id="presets"></div>
 <h2>MY MIXES</h2><div class="save"><input id="mixname" placeholder="Name this mix" maxlength="30"><button id="savebtn">SAVE</button></div><div id="mixes"></div>
@@ -48,11 +53,25 @@ async function init(){if(ctx)return;ctx=new(window.AudioContext||window.webkitAu
 const s=ctx.createBufferSource();s.buffer=ctx.createBuffer(1,1,22050);s.connect(ctx.destination);s.start(0);await ctx.resume();
 st.textContent="Loading loops…";let n=0;await Promise.all(L.map(async([k])=>{const a=await fetch("audio/"+k+".mp3").then(r=>{if(!r.ok)throw Error(k);return r.arrayBuffer()});buf[k]=await new Promise((ok,no)=>ctx.decodeAudioData(a,ok,no));S[k].g=ctx.createGain();S[k].g.gain.value=0;S[k].g.connect(master);const src=ctx.createBufferSource();src.buffer=buf[k];src.loop=true;src.connect(S[k].g);src.start();n++;st.textContent=`Loaded ${n}/${L.length}`}));
 st.textContent="Ready. Toggle layers or pick a scene.";started=true;window.__ready=true;Object.keys(S).forEach(apply)}
-function apply(k){const s=S[k];s.row.classList.toggle("on",s.on);s.row.querySelector("input").value=s.vol;if(s.g)s.g.gain.setTargetAtTime(s.on?s.vol:0,ctx.currentTime,.4)}
+const HOT=["combat","crypt","dungeon"],COOL=["tavern","market","rain"];let INT=50,sting=null;
+function ifac(k){const x=INT/100,e=x*x*(3-2*x);return HOT.includes(k)?0.5+e:COOL.includes(k)?1.5-e:1}
+function target(k){const s=S[k];if(!s.on)return 0;let v=s.vol*ifac(k);if(sting)v=Math.max(v*1.6,sting[k]||0);return Math.min(1,v)}
+function apply(k,fade){const s=S[k];s.row.classList.toggle("on",s.on);s.row.querySelector("input").value=s.vol;if(!s.g)return;const g=s.g.gain,t=ctx.currentTime;
+if(fade){g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(target(k),t+fade)}else{g.cancelScheduledValues(t);g.setTargetAtTime(target(k),t,.4)}}
 function setOn(k,v){S[k].on=v;if(!ctx)init();apply(k)}
 $("start").onclick=async()=>{await init();$("start").textContent=ctx.state==="running"?"♪ AUDIO ON":"TAP AGAIN TO START"};
 $("master").oninput=e=>{if(master)master.gain.setTargetAtTime(+e.target.value,ctx.currentTime,.1)};
-function load(m){if(!ctx)init();for(const k in S){S[k].on=k in m;if(k in m)S[k].vol=m[k];apply(k)}}
+function load(m,fade){if(!ctx)init();for(const k in S){S[k].on=k in m;if(k in m)S[k].vol=m[k];apply(k,fade)}document.querySelectorAll("#scenes button").forEach(b=>b.classList.remove("act"))}
+const SC={Calm:{m:{tavern:.65,rain:.4,wind:.25,road:.3},i:20},Tension:{m:{dungeon:.6,crypt:.35,wind:.5,market:.3,rain:.2},i:55},Combat:{m:{combat:.85,dungeon:.35,rain:.35,wind:.2},i:85}};
+function setInt(v,fade){INT=Math.max(0,Math.min(100,v));$("intensity").value=INT;$("ival").textContent=INT;for(const k in S)apply(k,fade)}
+function scene(n){const c=SC[n];INT=c.i;$("intensity").value=INT;$("ival").textContent=INT;load(c.m,2.5);document.querySelector(`#scenes [data-scene="${n}"]`).classList.add("act");st.textContent=n+" scene…"}
+document.querySelectorAll("#scenes button").forEach(b=>b.onclick=()=>scene(b.dataset.scene));
+$("intensity").oninput=e=>setInt(+e.target.value);
+function victory(){if(sting)return;if(!ctx)init();const b={};if(!Object.values(S).some(s=>s.on)){S.combat.on=true;S.combat.vol=.6}if(S.combat.on)b.combat=.9;if(!S.combat.on){/* swell existing layers only */}
+sting=b;$("sting").disabled=true;for(const k in S)apply(k,.6);setTimeout(()=>{sting=null;for(const k in S)apply(k,1.2);setTimeout(()=>{$("sting").disabled=false},1200)},1800)}
+$("sting").onclick=victory;
+document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT"&&e.target.type!=="range"||e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key.toLowerCase();
+if(k==="1")scene("Calm");else if(k==="2")scene("Tension");else if(k==="3")scene("Combat");else if(k==="v")victory();else if(k==="[")setInt(INT-10,.5);else if(k==="]")setInt(INT+10,.5);else if(k===" "&&!ctx){e.preventDefault();$("start").click()}});
 for(const n in P){const b=document.createElement("button");b.textContent=n.toUpperCase();b.onclick=()=>load(P[n]);$("presets").append(b)}
 const KEY="deadEchoesMixes";const get=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}};
 function draw(){const m=get();$("mixes").innerHTML="";for(const n in m){const b=document.createElement("button");b.className="";b.style.cssText="font:10px P,monospace;padding:12px 10px;background:#241f2e;color:#9fd8e0;border:3px solid #2fa3b3";b.textContent=n+" ✕";b.title="Tap to load, long-press/✕ via confirm to delete";b.onclick=()=>{if(confirm('Load "'+n+'"? (Cancel to delete)'))load(m[n]);else if(confirm('Delete "'+n+'"?')){delete m[n];localStorage.setItem(KEY,JSON.stringify(m));draw()}};$("mixes").append(b)}}
