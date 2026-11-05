@@ -1,81 +1,399 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dead Echoes GM Ambience Mixer · Dojo Studios</title>
+<title>Dead Echoes GM Mixer · Dojo Studios</title>
+<meta name="description" content="A free GM soundboard: real Dead Echoes music loops, six scenes, an intensity dial, GM moments and dice that can drive the music.">
 <meta name="theme-color" content="#0b0a10">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="icon" href="data:,">
+<link rel="preload" href="img/PressStart2P-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="img/VT323-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <style>
-@font-face{font-family:P;src:url(img/PressStart2P-Regular.ttf)}@font-face{font-family:V;src:url(img/VT323-Regular.ttf)}
-[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:#0b0a10;color:#e8dcc0;font:20px V,monospace;-webkit-text-size-adjust:100%}
-header{background:url(img/bg.png) center/cover;image-rendering:pixelated;padding:28px 16px 22px;text-align:center;border-bottom:4px solid #6b1a1a;position:relative}
-header:before{content:"";position:absolute;inset:0;background:linear-gradient(#0b0a1055,#0b0a10ee)}
-header *{position:relative}h1{font:16px/1.5 P,monospace;color:#f2c45a;margin:0 0 6px;text-shadow:3px 3px #000}
-.sub{color:#9fd8e0}main{max-width:760px;margin:auto;padding:12px}
-#start{display:block;width:100%;font:14px P,monospace;padding:18px;background:#6b1a1a;color:#f2c45a;border:4px solid #f2c45a;box-shadow:4px 4px #000;margin:10px 0;cursor:pointer}
-.row{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;background:#16131d;border:3px solid #2c2638;padding:8px 10px;margin:8px 0}
-.row.on{border-color:#2fa3b3}.row b{font:10px P,monospace;color:#f2c45a}.row small{color:#8c8299}
-.tg{width:52px;height:52px;font:18px P,monospace;background:#241f2e;color:#e8dcc0;border:3px solid #4a4058;cursor:pointer}
-.on .tg{background:#2fa3b3;color:#0b0a10}
-input[type=range]{width:100%;height:32px;accent-color:#f2c45a}
-.presets{display:flex;flex-wrap:wrap;gap:6px}.presets button,.save button{font:10px P,monospace;padding:12px 10px;background:#241f2e;color:#e8dcc0;border:3px solid #4a4058;cursor:pointer}
-.save{display:flex;gap:6px;margin-top:8px}.save input{flex:1;min-width:0;font:20px V;background:#16131d;color:#e8dcc0;border:3px solid #4a4058;padding:6px}
-h2{font:11px P,monospace;color:#9fd8e0;margin:20px 0 8px}#mixes{display:flex;flex-wrap:wrap;gap:6px}
-.links a{display:block;margin:8px 0;padding:12px;background:#16131d;border:3px solid #6b1a1a;color:#f2c45a;text-decoration:none}
-#status{color:#8c8299;min-height:1.2em}
-.scenes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.scenes button,#sting{font:11px P,monospace;min-height:56px;padding:10px 6px;background:#241f2e;color:#e8dcc0;border:3px solid #4a4058;cursor:pointer;touch-action:manipulation}.scenes button.act{border-color:#f2c45a;color:#f2c45a}#sting{display:block;width:100%;margin-top:8px;background:#3a2a0a;border-color:#f2c45a;color:#f2c45a}#sting:disabled{opacity:.5}.presets button,.save button{min-height:48px;touch-action:manipulation}.tg{touch-action:manipulation}kbd{font:12px V;color:#8c8299}.hint{color:#8c8299;font-size:17px;margin:6px 0}@media (hover:none){.hint{display:none}}
-footer{max-width:760px;margin:24px auto;padding:12px;color:#8c8299;font-size:17px;border-top:3px solid #2c2638}
+@font-face{font-family:P;src:url(img/PressStart2P-Regular.ttf);font-display:swap}
+@font-face{font-family:V;src:url(img/VT323-Regular.ttf);font-display:swap}
+:root{--bg:#0b0a10;--card:#16131d;--card2:#1d1926;--line:#2c2638;--line2:#4a4058;--gold:#f2c45a;--teal:#9fd8e0;--teal2:#2fa3b3;--blood:#6b1a1a;--ink:#e8dcc0;--mute:#8c8299;--red:#e0603a}
+[hidden]{display:none!important}*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:96px}
+body{margin:0;background:var(--bg);color:var(--ink);font:20px/1.25 V,monospace;padding-bottom:env(safe-area-inset-bottom)}
+button,input,summary{font:inherit;color:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
+button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.px{font-family:P,monospace;letter-spacing:.02em}
+main{max-width:880px;margin:auto;padding:0 12px 12px}
+h2{font:11px/1.4 P,monospace;color:var(--teal);margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h2 small{font:17px V,monospace;color:var(--mute);letter-spacing:0}
+.panel{background:var(--card);border:3px solid var(--line);padding:12px;margin:12px 0}
+/* hero */
+.hero{position:relative;max-width:880px;margin:0 auto;min-height:min(62vh,440px);display:flex;flex-direction:column;justify-content:flex-end;padding:18px 16px 16px;overflow:hidden;border-bottom:4px solid var(--blood);transition:min-height .45s ease}
+.hero:before{content:"";position:absolute;inset:0;background:url(img/bg.png) center 35%/cover;image-rendering:pixelated}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(#0b0a1000 20%,#0b0a10cc 62%,#0b0a10 100%)}
+.hero>*{position:relative;z-index:1}
+.tag{display:inline-block;font:9px P,monospace;color:var(--teal);border:2px solid var(--teal2);background:#0b0a10b0;padding:6px 8px;margin-bottom:10px}
+.hero h1{font:20px/1.4 P,monospace;color:var(--gold);margin:0 0 6px;text-shadow:3px 3px #000}
+.hero p{margin:0 0 12px;color:var(--ink);text-shadow:2px 2px #000}
+#begin{display:block;width:100%;min-height:64px;font:14px P,monospace;padding:16px;background:var(--blood);color:var(--gold);border:4px solid var(--gold);box-shadow:4px 4px #000;animation:glow 2.4s ease-in-out infinite}
+#begin:active{transform:translate(2px,2px);box-shadow:2px 2px #000}
+@keyframes glow{50%{box-shadow:4px 4px #000,0 0 22px #f2c45a66}}
+.hint{color:var(--mute);font-size:17px;margin:8px 0 0}
+#live{display:flex;align-items:center;gap:10px;font:11px/1.5 P,monospace;color:var(--gold);background:#0b0a10c0;border:3px solid var(--teal2);padding:12px}
+#live small{display:block;font:17px V,monospace;color:var(--teal);letter-spacing:0}
+.dot{flex:none;width:12px;height:12px;background:var(--teal2);box-shadow:0 0 0 3px #2fa3b355;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px #2fa3b300}}
+body.started .hero{min-height:200px}
+/* now playing */
+#np{position:sticky;top:0;z-index:30;background:#0b0a10f2;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-bottom:3px solid var(--line);padding:8px 12px calc(8px);padding-top:max(8px,env(safe-area-inset-top))}
+#np .in{max-width:856px;margin:auto;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.npl{min-width:0}.npl b{display:block;font:8px P,monospace;color:var(--mute)}
+#nowtxt{font:11px/1.6 P,monospace;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:8px}
+#nowtxt i{font-style:normal;flex:none;width:9px;height:9px;background:var(--line2)}
+body.started #nowtxt i{background:var(--teal2)}body.paused #nowtxt i{background:var(--red)}
+#pause{min-width:112px;min-height:48px;font:10px P,monospace;background:var(--card2);border:3px solid var(--line2);padding:8px 10px}
+#pause:disabled{opacity:.45}
+body.paused #pause{background:var(--red);color:#0b0a10;border-color:var(--gold);animation:glow 1.6s infinite}
+.vol{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.vol span{font:8px P,monospace;color:var(--mute)}.vol output{min-width:3ch;text-align:right;color:var(--mute)}
+#pausedbar{grid-column:1/-1;font:9px P,monospace;color:var(--red);text-align:center;padding:4px 0 0}
+/* range */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:8px;background:linear-gradient(90deg,var(--gold) var(--p,50%),var(--line2) var(--p,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-9px;background:var(--ink);border:4px solid var(--gold);box-shadow:2px 2px #000}
+input[type=range]::-moz-range-track{height:8px;background:var(--line2)}input[type=range]::-moz-range-progress{height:8px;background:var(--gold)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:0;background:var(--ink);border:4px solid var(--gold)}
+/* scenes */
+.scenes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:640px){.scenes{grid-template-columns:repeat(3,1fr)}}
+.scene{position:relative;text-align:left;min-height:112px;background:var(--card2);border:3px solid var(--line2);padding:10px;display:flex;flex-direction:column;gap:4px}
+.scene svg,.mom svg{width:36px;height:36px;shape-rendering:crispEdges;color:var(--gold);flex:none}
+.scene b{font:10px/1.4 P,monospace;color:var(--ink)}.scene span{color:var(--mute);font-size:17px;line-height:1.1}
+.scene kbd{position:absolute;top:8px;right:8px;font:14px V;color:var(--mute);border:2px solid var(--line2);padding:0 5px}
+.scene.act{border-color:var(--gold);background:#2a2214;box-shadow:inset 0 0 0 2px #f2c45a33}
+.scene.act b{color:var(--gold)}
+.scene.act kbd{display:none}.scene.act:after{content:"▶ PLAYING";position:absolute;right:6px;top:6px;font:7px P,monospace;color:#0b0a10;background:var(--gold);padding:4px 5px}
+body.paused .scene.act:after{content:"❚❚ PAUSED";background:var(--red)}
+.flavor{min-height:3.2em;margin:10px 0 0;padding-top:10px;border-top:2px dashed var(--line)}
+.flavor b{font:10px P,monospace;color:var(--gold)}.flavor em{display:block;color:var(--teal);margin-top:4px}
+/* intensity */
+.bandname{font:12px P,monospace;color:var(--gold)}
+.bands{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px}
+.bands button{min-height:44px;font:8px P,monospace;background:var(--card2);border:3px solid var(--line2);color:var(--mute);padding:6px 2px}
+.bands button.act{border-color:var(--gold);color:var(--gold);background:#2a2214}
+.ihelp{color:var(--mute);font-size:17px;margin:8px 0 0}
+/* moments + dice */
+.duo{display:grid;gap:0 12px}
+@media(min-width:760px){.duo{grid-template-columns:1.15fr 1fr}.duo .panel{margin:12px 0}}
+.moms{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.mom{text-align:left;min-height:76px;background:var(--card2);border:3px solid var(--line2);padding:8px;display:grid;grid-template-columns:36px 1fr;gap:2px 8px;align-items:center}
+.mom svg{grid-row:1/3}.mom b{font:9px/1.4 P,monospace}.mom span{color:var(--mute);font-size:16px;line-height:1.05}
+.mom.wide{grid-column:1/-1}
+.mom.busy{border-color:var(--gold);background:#2a2214;animation:glow 1s infinite}.mom.busy b{color:var(--gold)}
+#mcap{min-height:1.4em;margin:10px 0 0;color:var(--teal)}
+.dtypes{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.dtypes button{min-height:44px;font:9px P,monospace;background:var(--card2);border:3px solid var(--line2);padding:4px 0}
+.dtypes button.act{border-color:var(--gold);color:var(--gold)}
+.tray{display:flex;align-items:center;justify-content:center;gap:16px;margin:12px 0 6px;min-height:132px}
+#die{width:116px;height:116px;display:grid;place-items:center;font:30px P,monospace;color:var(--ink);background:var(--blood);position:relative;transition:clip-path .2s}
+#die:before{content:"";position:absolute;inset:6px;background:#2a1220;clip-path:inherit;z-index:0}
+#die span{position:relative;z-index:1;text-shadow:3px 3px #000}
+#die[data-s="4"]{clip-path:polygon(50% 2%,98% 92%,2% 92%)}#die[data-s="4"] span{margin-top:34px;font-size:24px}
+#die[data-s="6"]{clip-path:polygon(8% 8%,92% 8%,92% 92%,8% 92%)}
+#die[data-s="8"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+#die[data-s="10"]{clip-path:polygon(50% 0,98% 40%,50% 100%,2% 40%)}#die[data-s="10"] span{margin-top:-14px}
+#die[data-s="12"]{clip-path:polygon(50% 0,98% 36%,80% 96%,20% 96%,2% 36%)}
+#die[data-s="20"]{clip-path:polygon(50% 0,94% 25%,94% 75%,50% 100%,6% 75%,6% 25%)}
+#die.rolling{animation:tumble .7s steps(7) both}
+#die.nat20{background:var(--gold)}#die.nat1{background:var(--red)}
+@keyframes tumble{0%{transform:rotate(0) scale(1)}30%{transform:rotate(130deg) scale(.82)}60%{transform:rotate(250deg) scale(1.08)}100%{transform:rotate(360deg) scale(1)}}
+#dres{text-align:center;min-height:1.3em;color:var(--teal)}
+#dres.crit{color:var(--gold)}#dres.fumble{color:var(--red)}
+#roll{display:block;width:100%;min-height:56px;margin-top:8px;font:12px P,monospace;background:var(--blood);color:var(--gold);border:4px solid var(--gold);box-shadow:3px 3px #000}
+#roll:active{transform:translate(2px,2px);box-shadow:1px 1px #000}
+#dhist{text-align:center;color:var(--mute);font-size:17px;min-height:1.2em;margin-top:6px}
+.switch{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:10px;border:3px solid var(--line);background:var(--card2);cursor:pointer}
+.switch input{appearance:none;-webkit-appearance:none;flex:none;width:52px;height:30px;background:var(--line2);position:relative;margin:2px 0 0;border:3px solid var(--line2);cursor:pointer}
+.switch input:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:var(--mute);transition:left .15s}
+.switch input:checked{background:var(--teal2);border-color:var(--teal)}.switch input:checked:before{left:25px;background:#0b0a10}
+.switch b{font:9px/1.5 P,monospace}.switch span{display:block;color:var(--mute);font-size:17px}
+/* fine-tune */
+details.panel>summary{list-style:none;font:11px/1.4 P,monospace;color:var(--teal);min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary:after{content:"＋";font:20px V;color:var(--gold)}details[open].panel>summary:after{content:"－"}
+.row{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;background:var(--card2);border:3px solid var(--line);padding:8px 10px;margin:8px 0}
+.row.on{border-color:var(--teal2)}
+.row b{font:10px P,monospace;color:var(--gold)}.row small{color:var(--mute)}
+.row em{font:7px P,monospace;font-style:normal;color:#0b0a10;background:var(--teal);padding:3px 4px;margin-left:4px;vertical-align:2px}
+.tg{width:52px;height:52px;font:18px P,monospace;background:#241f2e;border:3px solid var(--line2)}
+.on .tg{background:var(--teal2);color:#0b0a10}
+.meter{height:4px;background:var(--line);margin-top:2px}.meter i{display:block;height:100%;width:0;background:var(--teal);transition:width .4s}
+.ftnote{color:var(--mute);font-size:17px;margin:4px 0}
+/* mixes */
+.save{display:flex;gap:6px}
+.save input{flex:1;min-width:0;font:20px V;background:var(--card2);border:3px solid var(--line2);padding:6px 8px;min-height:48px}
+.btn{font:10px P,monospace;min-height:48px;padding:10px 12px;background:#241f2e;border:3px solid var(--line2)}
+#mixes{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:flex;border:3px solid var(--teal2)}
+.chip button{font:10px P,monospace;min-height:44px;padding:8px 10px;background:var(--card2);color:var(--teal);border:0}
+.chip button+button{border-left:3px solid var(--teal2);color:var(--mute);padding:8px 12px;min-width:48px}
+.chip.act{border-color:var(--gold)}.chip.act button:first-child{color:var(--gold)}
+#nomix{color:var(--mute);font-size:17px}
+.links a{display:block;margin:8px 0;padding:12px;min-height:48px;background:var(--card2);border:3px solid var(--blood);color:var(--gold);text-decoration:none}
+.links a small{display:block;color:var(--mute);font-size:16px}
+.honest p{margin:6px 0}.honest ul{margin:6px 0;padding-left:20px}.honest li{margin:4px 0}
+.keys{color:var(--mute);font-size:17px;line-height:1.6}.keys kbd{font:15px V;color:var(--ink);border:2px solid var(--line2);padding:0 5px}
+@media(hover:none){.scene kbd{display:none}}
+footer{max-width:880px;margin:16px auto 24px;padding:12px;color:var(--mute);font-size:17px;border-top:3px solid var(--line)}
+#toasts{position:fixed;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;padding:0 12px}
+.toast{max-width:520px;width:100%;background:#0b0a10f5;border:3px solid var(--gold);box-shadow:4px 4px #000;padding:10px 12px;color:var(--ink);animation:tin .2s ease-out}
+.toast b{font:9px P,monospace;color:var(--gold);display:block;margin-bottom:2px}
+.toast.out{opacity:0;transition:opacity .3s}
+@keyframes tin{from{transform:translateY(10px);opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
-<header><h1>DEAD ECHOES<br>AMBIENCE MIXER</h1><div class="sub">Layer dark-fantasy loops for your table · by Dojo Studios</div></header>
+<header class="hero" id="top">
+  <div><span class="tag">DOJO STUDIOS · DEAD ECHOES</span></div>
+  <h1>DEAD ECHOES<br>GM MIXER</h1>
+  <p>Real dark-fantasy music loops that follow your table. Pick a scene, turn up the dread, hit a moment.</p>
+  <div id="pre">
+    <button id="begin">▶ BEGIN THE SESSION</button>
+    <div class="hint">Sound starts on this tap. iPhone: we ask Safari to play through the silent switch, but if you hear nothing, flip the ringer switch on and raise the volume.</div>
+  </div>
+  <div id="live" hidden role="status"><span class="dot"></span><div>THE SESSION IS LIVE<small id="loadtxt">Loading loops…</small></div></div>
+</header>
+<div id="np" role="region" aria-label="Now playing"><div class="in">
+  <div class="npl"><b>NOW PLAYING</b><div id="nowtxt"><i></i><span id="nowlabel">Not started · tap Begin</span></div></div>
+  <button id="pause" disabled aria-pressed="false">❚❚ PAUSE</button>
+  <label class="vol"><span>VOL</span><input type="range" id="master" min="0" max="1" step="0.01" value="0.8" aria-label="Master volume"><output id="mval">80</output></label>
+  <div id="pausedbar" hidden>❚❚ PAUSED · SOUND IS OFF</div>
+</div></div>
 <main>
-<button id="start">▶ TAP TO START AUDIO</button><div id="status"></div>
-<div class="row"><span>🔊</span><div><b>MASTER</b><input type="range" id="master" min="0" max="1" step="0.01" value="0.8" aria-label="Master volume"></div></div>
-<h2>SCENES</h2><div class="scenes" id="scenes"><button data-scene="Calm">CALM</button><button data-scene="Tension">TENSION</button><button data-scene="Combat">COMBAT</button></div>
-<button id="sting">🏆 VICTORY STING</button>
-<div class="row"><span>🔥</span><div><b>INTENSITY</b> <small id="ival">50</small><input type="range" id="intensity" min="0" max="100" step="1" value="50" aria-label="Intensity"></div></div>
-<div class="hint">Keys: <kbd>1</kbd> Calm · <kbd>2</kbd> Tension · <kbd>3</kbd> Combat · <kbd>V</kbd> Victory · <kbd>[</kbd>/<kbd>]</kbd> Intensity ∓10 · <kbd>Space</kbd> start audio</div>
-<div id="layers"></div>
-<h2>SCENE PRESETS</h2><div class="presets" id="presets"></div>
-<h2>MY MIXES</h2><div class="save"><input id="mixname" placeholder="Name this mix" maxlength="30"><button id="savebtn">SAVE</button></div><div id="mixes"></div>
-<h2>SUPPORT &amp; MORE</h2><div class="links">
-<a id="kofi" href="#" data-todo="KOFI_URL_TBD">☕ Tip on Ko-fi (link coming soon)</a>
-<a href="https://dojostudios.gumroad.com/l/ktneso" target="_blank" rel="noopener">🎲 Dead Echoes Ambience — Foundry VTT module (Gumroad)</a>
-<a href="https://dojostudios.gumroad.com/l/pkawsb" target="_blank" rel="noopener">📜 Dead Echoes GM Kit (Gumroad)</a></div>
+<section class="panel" aria-labelledby="h-scn"><h2 id="h-scn">SCENES <small>tap to crossfade</small></h2>
+  <div class="scenes" id="scenes"></div>
+  <div class="flavor" id="flavor"><b>CHOOSE A SCENE</b><em>Each scene is a mix of real music loops plus weather. Intensity then reshapes it.</em></div>
+</section>
+<section class="panel" aria-labelledby="h-int"><h2 id="h-int">INTENSITY <span class="bandname" id="bandname">UNEASY</span></h2>
+  <input type="range" id="intensity" min="0" max="100" step="1" value="40" aria-label="Intensity" aria-valuetext="40, Uneasy">
+  <div class="bands" id="bands"></div>
+  <div class="ihelp">Higher intensity pushes the dark loops (Undercity, Crypt, Blades) forward, pulls the calm ones back, and blends in each scene's own undertow layers.</div>
+</section>
+<div class="duo">
+<section class="panel" id="moments" aria-labelledby="h-mom"><h2 id="h-mom">GM MOMENTS <small>one tap, then it settles</small></h2>
+  <div class="moms" id="moms"></div>
+  <div id="mcap" aria-live="polite"></div>
+</section>
+<section class="panel" id="dice" aria-labelledby="h-dice"><h2 id="h-dice">DICE <small>fair rolls in your browser</small></h2>
+  <div class="dtypes" id="dtypes"></div>
+  <div class="tray"><div id="die" data-s="20" aria-hidden="true"><span>20</span></div></div>
+  <div id="dres" aria-live="polite">Pick a die and roll.</div>
+  <button id="roll">ROLL D20</button>
+  <div id="dhist"></div>
+  <label class="switch"><input type="checkbox" id="drive"><div><b>DICE DRIVE THE MUSIC</b><span>Natural 20 on a d20 fires Critical Hit. Natural 1 fires Something Moves.</span></div></label>
+</section>
+</div>
+<details class="panel" id="fine"><summary>FINE-TUNE LAYERS (8)</summary>
+  <p class="ftnote">Toggle and balance every layer. The bar under each slider is what it is really playing right now, after scene, intensity and moments. <em style="font:7px P,monospace;font-style:normal;color:#0b0a10;background:var(--teal);padding:3px 4px">AUTO</em> means intensity is blending it in.</p>
+  <div id="layers"></div>
+</details>
+<section class="panel" aria-labelledby="h-mix"><h2 id="h-mix">MY MIXES <small>saved in this browser</small></h2>
+  <div class="save"><input id="mixname" placeholder="Name this mix" maxlength="30" aria-label="Mix name"><button class="btn" id="savebtn">SAVE</button></div>
+  <div id="mixes"></div><div id="nomix">No saved mixes yet. Saves layers, volumes, scene and intensity.</div>
+</section>
+<section class="panel" aria-labelledby="h-keys" id="keyspanel"><h2 id="h-keys">SHORTCUTS <small>keyboard</small></h2>
+  <div class="keys"><kbd>Space</kbd> begin · <kbd>P</kbd> pause/resume · <kbd>1</kbd>–<kbd>6</kbd> scenes · <kbd>[</kbd> <kbd>]</kbd> intensity ∓10 · <kbd>I</kbd> roll initiative · <kbd>C</kbd> critical hit · <kbd>V</kbd> party victory · <kbd>M</kbd> something moves · <kbd>R</kbd> rest at camp · <kbd>D</kbd> roll d20</div>
+</section>
+<section class="panel" aria-labelledby="h-sup"><h2 id="h-sup">SUPPORT &amp; MORE</h2><div class="links">
+  <a id="kofi" href="#" data-todo="KOFI_URL_TBD">☕ Tip on Ko-fi (link coming soon)</a>
+  <a href="https://dojostudios.gumroad.com/l/ktneso" target="_blank" rel="noopener">🎲 Dead Echoes Ambience · Foundry VTT module (Gumroad)<small>A separate paid module. This web mixer does not connect to Foundry.</small></a>
+  <a href="https://dojostudios.gumroad.com/l/pkawsb" target="_blank" rel="noopener">📜 Dead Echoes GM Kit (Gumroad)</a></div>
+</section>
+<section class="panel honest" id="honest" aria-labelledby="h-hon"><h2 id="h-hon">WHAT THIS IS · HONEST NOTE</h2>
+  <p>A free browser soundboard for running a dark-fantasy table. Nothing is uploaded and there is no account.</p>
+  <ul>
+    <li><b>Music:</b> the six music layers are instrumental loops from the Dead Echoes Ambience album, generated with Suno AI from Dojo Studios' own prompts, then picked, trimmed, looped and loudness-matched by hand.</li>
+    <li><b>Synthesized:</b> Rain and Wind &amp; Stone are synthesized noise. The moment stingers (war drums, crit riser, victory fanfare, the low swell and bell) and the dice clicks are synthesized live in your browser.</li>
+    <li><b>Art:</b> the pixel art is AI-assisted and selected by Dojo Studios.</li>
+    <li><b>Saving:</b> My Mixes and the dice toggle live in this browser's local storage only.</li>
+  </ul>
+</section>
 </main>
-<footer><b>AI disclosure:</b> The music loops are instrumental tracks from Dead Echoes Ambience, generated with Suno AI from Dojo Studios' own prompts, then picked, trimmed, looped and loudness-matched by hand. The header art is AI-generated pixel-style art selected by Dojo Studios. The Rain and Wind layers are synthesized noise. Mixes are saved only in this browser (localStorage). © Dojo Studios.</footer>
+<footer>© Dojo Studios · Dead Echoes GM Mixer v2</footer>
+<div id="toasts" aria-live="polite"></div>
+<audio id="keep" playsinline loop preload="none"></audio>
 <script>
-const L=[["tavern","Echo Tavern","Tavern · rest & social"],["dungeon","Undercity","Dungeon delve"],["crypt","After the Death Save","Crypt · grief · aftermath"],["combat","Blades in the Rain","Combat"],["market","Whisper Market","Intrigue · heist"],["road","Lantern Road","Night travel"],["rain","Rain","Synth rain layer"],["wind","Wind & Stone","Low rumble / room tone"]];
+"use strict";
+const $=id=>document.getElementById(id);
+/* ---------- data ---------- */
+const L=[["tavern","Echo Tavern","Tavern · rest & social"],["dungeon","Undercity","Dungeon delve"],["crypt","After the Death Save","Crypt · grief · aftermath"],["combat","Blades in the Rain","Combat"],["market","Whisper Market","Intrigue · heist"],["road","Lantern Road","Night travel"],["rain","Rain","Synthesized rain"],["wind","Wind & Stone","Synthesized low rumble"]];
 const P={"Tavern Night":{tavern:.8,rain:.35},"Dungeon Delve":{dungeon:.8,wind:.5},"Crypt":{crypt:.7,wind:.6,rain:.15},"Ambush!":{combat:.85,rain:.4},"Heist":{market:.75,rain:.25},"Road at Night":{road:.75,wind:.3,rain:.2}};
-let ctx,master,S={},buf={},started=false;const $=id=>document.getElementById(id);
-const st=$("status");
-L.forEach(([k,n,d])=>{const r=document.createElement("div");r.className="row";r.id="r-"+k;r.innerHTML=`<button class="tg" aria-label="Toggle ${n}">♪</button><div><b>${n.toUpperCase()}</b> <small>${d}</small><input type="range" min="0" max="1" step="0.01" value="0.7" aria-label="${n} volume"></div>`;$("layers").append(r);
-S[k]={on:false,vol:.7,row:r};r.querySelector(".tg").onclick=()=>setOn(k,!S[k].on);r.querySelector("input").oninput=e=>{S[k].vol=+e.target.value;apply(k)}});
-async function init(){if(ctx)return;ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=+$("master").value;master.connect(ctx.destination);
-// iOS unlock: play a silent buffer inside the tap
-const s=ctx.createBufferSource();s.buffer=ctx.createBuffer(1,1,22050);s.connect(ctx.destination);s.start(0);await ctx.resume();
-st.textContent="Loading loops…";let n=0;await Promise.all(L.map(async([k])=>{const a=await fetch("audio/"+k+".mp3").then(r=>{if(!r.ok)throw Error(k);return r.arrayBuffer()});buf[k]=await new Promise((ok,no)=>ctx.decodeAudioData(a,ok,no));S[k].g=ctx.createGain();S[k].g.gain.value=0;S[k].g.connect(master);const src=ctx.createBufferSource();src.buffer=buf[k];src.loop=true;src.connect(S[k].g);src.start();n++;st.textContent=`Loaded ${n}/${L.length}`}));
-st.textContent="Ready. Toggle layers or pick a scene.";started=true;window.__ready=true;Object.keys(S).forEach(apply)}
-const HOT=["combat","crypt","dungeon"],COOL=["tavern","market","rain"];let INT=50,sting=null;
-function ifac(k){const x=INT/100,e=x*x*(3-2*x);return HOT.includes(k)?0.5+e:COOL.includes(k)?1.5-e:1}
-function target(k){const s=S[k];if(!s.on)return 0;let v=s.vol*ifac(k);if(sting)v=Math.max(v*1.6,sting[k]||0);return Math.min(1,v)}
-function apply(k,fade){const s=S[k];s.row.classList.toggle("on",s.on);s.row.querySelector("input").value=s.vol;if(!s.g)return;const g=s.g.gain,t=ctx.currentTime;
-if(fade){g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(target(k),t+fade)}else{g.cancelScheduledValues(t);g.setTargetAtTime(target(k),t,.4)}}
-function setOn(k,v){S[k].on=v;if(!ctx)init();apply(k)}
-$("start").onclick=async()=>{await init();$("start").textContent=ctx.state==="running"?"♪ AUDIO ON":"TAP AGAIN TO START"};
-$("master").oninput=e=>{if(master)master.gain.setTargetAtTime(+e.target.value,ctx.currentTime,.1)};
-function load(m,fade){if(!ctx)init();for(const k in S){S[k].on=k in m;if(k in m)S[k].vol=m[k];apply(k,fade)}document.querySelectorAll("#scenes button").forEach(b=>b.classList.remove("act"))}
-const SC={Calm:{m:{tavern:.65,rain:.4,wind:.25,road:.3},i:20},Tension:{m:{dungeon:.6,crypt:.35,wind:.5,market:.3,rain:.2},i:55},Combat:{m:{combat:.85,dungeon:.35,rain:.35,wind:.2},i:85}};
-function setInt(v,fade){INT=Math.max(0,Math.min(100,v));$("intensity").value=INT;$("ival").textContent=INT;for(const k in S)apply(k,fade)}
-function scene(n){const c=SC[n];INT=c.i;$("intensity").value=INT;$("ival").textContent=INT;load(c.m,2.5);document.querySelector(`#scenes [data-scene="${n}"]`).classList.add("act");st.textContent=n+" scene…"}
-document.querySelectorAll("#scenes button").forEach(b=>b.onclick=()=>scene(b.dataset.scene));
+const ICON={
+tavern:["............","..wwwwww....",".wwwwwwww...",".########...",".#yyyyyy####",".#y#yy#y#..#",".#y#yy#y#..#",".#y#yy#y#..#",".#yyyyyy####",".#yyyyyy#...",".########...","............"],
+dungeon:["....r.......","...rrr......","...ryr......","....y.......","...ooo......","...ooo......","....o.......","..#.o.#.#...","..###o###...","..#######...","..#######...","............"],
+battle:["ww........ww","www......www",".www....www.","..www..www..","...wwwwww...","....wwww....","...wwwwww...","..www..www..",".#o#....#o#.","#o#......#o#","o#........#o","............"],
+crypt:["...######...","..########..",".##########.",".##..##..##.",".##..##..##.",".##########.","..###..###..","...######...","...#.##.#...","...######...","............","............"],
+heist:["............","............",".##########.","############","##..####..##","##..####..##","############",".####..####.","..##....##..","............","............","............"],
+road:[".....##.....","....#..#....","...######...","...#yyyy#...","...#yryy#...","...#yyyy#...","...#yyyy#...","...######...","....####....","............","............","............"],
+init:["....##......","...###......","..###.......",".#######....","######......","...####.....","..#######...",".....###....","....###.....","...###......","..##........","............"],
+crit:[".....y......",".y...y...y..","..y..y..y...","...yyyyy....","....wwww....","yyyywwwwyyyy","....wwww....","...yyyyy....","..y..y..y...",".y...y...y..",".....y......","............"],
+victory:["y.yyyyyyyy.y","y.yyyyyyyy.y","yyyyyyyyyyyy","..yyyyyyyy..","..yyyyyyyy..","...yyyyyy...","....yyyy....",".....yy.....",".....yy.....","....yyyy....","...oooooo...","............"],
+moves:["............","............","....####....","..##bbbb##..",".#bb####bb#.","#bb##ww##bb#","#bb##ww##bb#",".#bb####bb#.","..##bbbb##..","....####....","............","............"],
+rest:[".....r......","....rr......","...ryrr.....","...ryyr.r...","..ryyyyrr...","..ryywyyr...","...ryyyr....","o.......o...",".oo...oo....","...ooo......",".oo...oo....","o.......o..."]};
+const COL={"#":"currentColor",y:"#f2c45a",r:"#e0603a",w:"#e8dcc0",o:"#8a5a2b",b:"#9fd8e0"};
+function svg(n){let r="";ICON[n].forEach((row,y)=>[...row].forEach((c,x)=>{if(COL[c])r+=`<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${COL[c]}"/>`}));return`<svg viewBox="0 0 12 12" aria-hidden="true">${r}</svg>`}
+const SCN=[
+ {id:"tavern",name:"Tavern Night",mix:P["Tavern Night"],i:20,up:{market:.3,wind:.3},desc:"Echo Tavern, rain on the shutters",flavor:"Firelight, low voices, and a door that never quite closes."},
+ {id:"dungeon",name:"Dungeon Delve",mix:P["Dungeon Delve"],i:55,up:{crypt:.35,combat:.2},desc:"Undercity drone, stone and draft",flavor:"Every corridor down here sounds like it is breathing."},
+ {id:"battle",name:"Battle",mix:P["Ambush!"],i:85,up:{dungeon:.35,wind:.25},desc:"Ambush! Blades in the Rain",flavor:"Steel, mud, and the drum of your own heart."},
+ {id:"crypt",name:"Crypt",mix:P.Crypt,i:60,up:{dungeon:.35},desc:"After the Death Save, cold wind",flavor:"The dead were buried here. Not all of them stayed."},
+ {id:"heist",name:"Heist",mix:P.Heist,i:45,up:{dungeon:.3,combat:.15},desc:"Whisper Market under drizzle",flavor:"Quiet feet, loud hearts, and a lock that will not give."},
+ {id:"road",name:"Road at Night",mix:P["Road at Night"],i:30,up:{crypt:.3,wind:.25},desc:"Lantern Road, wind, light rain",flavor:"One lantern, a long road, and something keeping pace."}];
+const CAMP={id:"camp",name:"Rest at Camp",mix:{road:.75,rain:.5,wind:.12},i:10,up:{},flavor:"Boots off, watches set, rain ticking on the canvas."};
+const SCMAP={};SCN.concat(CAMP).forEach(s=>SCMAP[s.id]=s);
+const BANDS=[["Calm",0,24,12],["Uneasy",25,49,38],["Tense",50,74,62],["Dread",75,100,88]];
+const band=v=>BANDS.find(b=>v>=b[1]&&v<=b[2])[0];
+const HOT=["combat","crypt","dungeon"],COOL=["tavern","market","rain"];
+/* ---------- state ---------- */
+let ctx=null,master,bus,pg,sfx,noiseBuf,started=false,paused=false,cur=null,INT=40,ovl=null,mtimers=[],busyMom=null,loaded=0,curMix=null;
+const S={};L.forEach(([k])=>S[k]={on:false,vol:.7});
+/* ---------- engine ---------- */
+const sm=x=>x<=0?0:x>=1?1:x*x*(3-2*x);
+function ifac(k){const e=sm(INT/100);return HOT.includes(k)?.5+e:COOL.includes(k)?1.5-e:.8+.4*e}
+function under(k){const s=cur&&SCMAP[cur];return s&&s.up[k]?s.up[k]*sm((INT-35)/65):0}
+function target(k){const s=S[k];let v=(s.on?s.vol*ifac(k):0)+under(k);if(ovl&&k in ovl)v=Math.max(v,ovl[k]);return Math.min(1,Math.round(v*1000)/1000)}
+function apply(k,fade){const s=S[k],t=target(k);
+  if(s.row){s.row.classList.toggle("on",s.on);const r=s.row.querySelector("input");r.value=s.vol;fill(r);s.row.querySelector(".meter i").style.width=(t*100)+"%";s.row.querySelector("em").hidden=!(under(k)>.01)}
+  if(t>0&&ctx)ensure(k);
+  if(!s.g)return;const g=s.g.gain,now=ctx.currentTime;g.cancelScheduledValues(now);
+  if(fade){g.setValueAtTime(g.value,now);g.linearRampToValueAtTime(t,now+fade)}else g.setTargetAtTime(t,now,.06)}
+function applyAll(fade){for(const k in S)apply(k,fade)}
+function ramp(param,v,dur,at){const now=ctx.currentTime,t=at!=null?at:now;param.cancelScheduledValues(t);param.setValueAtTime(param.value,t);param.linearRampToValueAtTime(v,t+dur)}
+function ensure(k){const s=S[k];if(s.p||!ctx)return s.p;
+  s.p=fetch("audio/"+k+".mp3").then(r=>{if(!r.ok)throw Error(k+" "+r.status);return r.arrayBuffer()})
+   .then(a=>new Promise((ok,no)=>ctx.decodeAudioData(a,ok,no)))
+   .then(b=>{const src=ctx.createBufferSource();src.buffer=b;src.loop=true;src.connect(s.g);src.start();s.src=src;loaded++;loadStatus()})
+   .catch(e=>{s.p=null;console.warn(e);toast("Loop failed to load",L.find(x=>x[0]===k)[1]+". Check your connection and tap the scene again.")});return s.p}
+function loadStatus(){$("loadtxt").textContent=loaded<L.length?`Loading loops ${loaded}/${L.length} · scene plays as soon as its loops arrive`:`All ${L.length} loops ready · ${SCMAP[cur]?SCMAP[cur].name:"custom mix"}`}
+function preloadRest(){let chain=Promise.resolve();L.forEach(([k])=>{chain=chain.then(()=>ensure(k)).catch(()=>{})})}
+function silentWav(){const n=8000,b=new ArrayBuffer(44+n*2),v=new DataView(b),w=(o,s)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
+  w(0,"RIFF");v.setUint32(4,36+n*2,true);w(8,"WAVEfmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,8000,true);v.setUint32(28,16000,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,"data");v.setUint32(40,n*2,true);
+  return URL.createObjectURL(new Blob([b],{type:"audio/wav"}))}
+function begin(){ // must run synchronously inside the user's tap
+  if(started){if(paused)resume();return}
+  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+  const AC=window.AudioContext||window.webkitAudioContext;ctx=new AC();
+  const comp=ctx.createDynamicsCompressor();comp.threshold.value=-8;comp.knee.value=8;comp.ratio.value=4;comp.attack.value=.005;comp.release.value=.25;comp.connect(ctx.destination);
+  pg=ctx.createGain();pg.connect(comp);master=ctx.createGain();master.gain.value=+$("master").value;master.connect(pg);
+  bus=ctx.createGain();bus.connect(master);sfx=ctx.createGain();sfx.gain.value=.9;sfx.connect(master);
+  for(const k in S){S[k].g=ctx.createGain();S[k].g.gain.value=0;S[k].g.connect(bus)}
+  const s=ctx.createBufferSource();s.buffer=ctx.createBuffer(1,1,22050);s.connect(ctx.destination);s.start(0);
+  if(ctx.resume)ctx.resume();
+  const el=$("keep");el.src=silentWav();el.volume=.01;const pr=el.play();if(pr&&pr.catch)pr.catch(()=>{});
+  noiseBuf=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  ctx.onstatechange=()=>{if(!paused&&ctx.state!=="running"){$("nowlabel").textContent="Audio interrupted · tap Resume";paused=true;ui()}};
+  started=true;window.__ready=true;document.body.classList.add("started");$("pre").hidden=true;$("live").hidden=false;$("pause").disabled=false;
+  mediaSetup();loadStatus();
+  if(cur)setScene(cur,{quiet:true});else if(curMix||Object.values(S).some(x=>x.on))applyAll(2);else setScene("tavern",{quiet:true});
+  toast("The session is live",(SCMAP[cur]?SCMAP[cur].name:"Your mix")+" · "+band(INT)+". Pick a scene or hit a moment.");
+  const first=Object.keys(S).filter(k=>target(k)>0).map(ensure);Promise.all(first).then(preloadRest,preloadRest);ui()}
+function pause(){if(!started||paused)return;paused=true;ramp(pg.gain,0,.25);const c=ctx;setTimeout(()=>{if(paused&&c.state==="running")c.suspend()},320);$("keep").pause();ui();toast("Paused","Everything is silent. Tap Resume or press P.")}
+function resume(){if(!started)return begin();paused=false;const p=ctx.resume?ctx.resume():null;ramp(pg.gain,1,.4);const pr=$("keep").play();if(pr&&pr.catch)pr.catch(()=>{});ui();toast("Resumed",nowText())}
+function togglePause(){paused?resume():pause()}
+/* ---------- scenes / intensity ---------- */
+function cancelMoments(){mtimers.forEach(clearTimeout);mtimers=[];ovl=null;busyMom=null;if(bus)ramp(bus.gain,1,.6);document.querySelectorAll(".mom.busy").forEach(b=>b.classList.remove("busy"))}
+function setScene(id,o={}){const s=SCMAP[id];if(!s)return;if(!o.keepMoment)cancelMoments();cur=id;curMix=null;
+  for(const k in S){S[k].on=k in s.mix;if(k in s.mix)S[k].vol=s.mix[k]}
+  INT=o.i!=null?o.i:s.i;if(!started){ui();return}
+  applyAll(o.fade!=null?o.fade:2.5);ui();if(!o.quiet)toast(s.name,s.flavor)}
+function setInt(v,fade){INT=Math.max(0,Math.min(100,Math.round(v)));applyAll(fade);ui()}
+/* ---------- synth stingers (labelled as synthesized in the honest note) ---------- */
+function env(g,t,a,peak,d){g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d)}
+function osc(type,f,t,a,peak,d,dest,f2){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+a+d);env(g,t,a,peak,d);o.connect(g);g.connect(dest||sfx);o.start(t);o.stop(t+a+d+.05);return o}
+function noise(t,dur,filt,f,peak,a,q,f2){const n=ctx.createBufferSource();n.buffer=noiseBuf;n.loop=true;const fl=ctx.createBiquadFilter();fl.type=filt;fl.frequency.setValueAtTime(f,t);if(f2)fl.frequency.exponentialRampToValueAtTime(f2,t+dur);fl.Q.value=q||1;const g=ctx.createGain();env(g,t,a,peak,dur-a);n.connect(fl);fl.connect(g);g.connect(sfx);n.start(t);n.stop(t+dur+.05)}
+function drum(t,p){osc("sine",130,t,.005,.9*(p||1),.45,null,42);noise(t,.18,"lowpass",900,.35,.003)}
+const SYN={
+ drums(){const t=ctx.currentTime+.02;[0,.32,.64,.8].forEach((d,i)=>drum(t+d,i==3?1.2:.85))},
+ riser(){const t=ctx.currentTime+.02;noise(t,.75,"bandpass",300,.5,.65,5,4200);osc("sawtooth",110,t,.6,.12,.15,null,440);const h=t+.72;drum(h,1.1);osc("square",660,h,.004,.18,.6);osc("square",990,h,.004,.12,.5);osc("triangle",1320,h,.004,.2,.9)},
+ fanfare(){const t=ctx.currentTime+.05,n=[392,523.25,659.25,783.99,1046.5];n.forEach((f,i)=>{const d=i==n.length-1?1.6:.22;osc("triangle",f,t+i*.15,.01,.3,d);osc("square",f,t+i*.15,.01,.06,d);});osc("triangle",261.63,t+.6,.05,.22,1.6);drum(t+.6,.7)},
+ swell(){const t=ctx.currentTime+.02;[44,66].forEach(f=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(.45,t+2);g.gain.linearRampToValueAtTime(0.0001,t+4.5);o.connect(g);g.connect(sfx);o.start(t);o.stop(t+4.6)});noise(t,4.5,"lowpass",220,.25,2,1)},
+ bell(){const t=ctx.currentTime+1.3;[[1,.32],[2.01,.12],[2.76,.12],[5.4,.06],[8.9,.03]].forEach(([m,a])=>osc("sine",146.8*m,t,.004,a,4.2))},
+ dice(){const t=ctx.currentTime+.01;for(let i=0;i<6;i++)noise(t+i*.09+Math.random()*.04,.05,"highpass",2200+Math.random()*2000,.25,.002,1)}};
+/* ---------- GM moments ---------- */
+function later(ms,fn){mtimers.push(setTimeout(fn,ms))}
+function snapshot(){const l={};for(const k in S)l[k]={on:S[k].on,vol:S[k].vol};return{cur,INT,l,curMix}}
+function restore(sn,fade){cur=sn.cur;INT=sn.INT;curMix=sn.curMix;for(const k in sn.l){S[k].on=sn.l[k].on;S[k].vol=sn.l[k].vol}applyAll(fade);ui()}
+function markBusy(id,ms){document.querySelectorAll(".mom").forEach(b=>b.classList.toggle("busy",b.dataset.m===id));busyMom=id;later(ms,()=>{const b=document.querySelector(`.mom[data-m="${id}"]`);if(b)b.classList.remove("busy");busyMom=null})}
+function caption(t,d){$("mcap").textContent=t+(d?" · "+d:"");toast(t,d)}
+const MOM={
+ init:{name:"Roll Initiative",desc:"War drums, jump to Battle at 80",key:"I",run(){setScene("battle",{i:80,fade:1.2,quiet:true});SYN.drums();markBusy("init",1600);caption("Roll for initiative!","Battle · intensity 80 · Dread")}},
+ crit:{name:"Critical Hit",desc:"Rising stinger, music surges",key:"C",run(){cancelMoments();ovl={};for(const k in S){const t=target(k);if(t>0)ovl[k]=Math.min(1,t*1.5+.15)}applyAll(.3);ramp(bus.gain,1.2,.3);SYN.riser();markBusy("crit",2600);
+   later(1400,()=>{ovl=null;applyAll(1.4);ramp(bus.gain,1,1.4)});caption("Critical hit!","The music surges, then settles back.")}},
+ victory:{name:"Party Victory",desc:"Fanfare, then ease back",key:"V",run(){const sn=snapshot();cancelMoments();ovl={combat:.9};applyAll(.6);ramp(bus.gain,1.15,.6);SYN.fanfare();markBusy("victory",8000);
+   const back=SCMAP[sn.cur]?SCMAP[sn.cur].name:"your mix";caption("Victory!","Triumph, then easing back to "+back+"…");
+   later(3800,()=>{ovl=null;ramp(bus.gain,1,4);restore(sn,4)});later(8000,()=>{$("mcap").textContent="Back to "+back+" · "+band(INT)})}},
+ moves:{name:"Something Moves",desc:"Music ducks, low swell, one bell",key:"M",run(){cancelMoments();ovl={wind:.75};applyAll(.8);ramp(bus.gain,.4,.6);SYN.swell();SYN.bell();markBusy("moves",6500);
+   later(3200,()=>{ovl=null;applyAll(3);ramp(bus.gain,1,3)});caption("Something moves in the dark…","The music holds its breath.")}},
+ rest:{name:"Rest at Camp",desc:"Slow fade to Lantern Road and rain",key:"R",wide:1,run(){setScene("camp",{fade:6,quiet:true});markBusy("rest",6000);caption("The party rests at camp.","Lantern Road and rain · intensity 10 · Calm")}}};
+function moment(id){if(!started)begin();else if(paused)resume();MOM[id].run();ui()}
+/* ---------- dice ---------- */
+let SIDES=+(localStorage.getItem("deadEchoesDie")||20),rolling=false;const hist=[];
+function rnd(n){const a=new Uint32Array(1),lim=Math.floor(4294967296/n)*n;do crypto.getRandomValues(a);while(a[0]>=lim);return a[0]%n+1}
+function setDie(n){SIDES=n;try{localStorage.setItem("deadEchoesDie",n)}catch(e){}document.querySelectorAll("#dtypes button").forEach(b=>b.classList.toggle("act",+b.dataset.s===n));$("die").dataset.s=n;$("roll").textContent="ROLL D"+n;if(!rolling){$("die").className="";$("die").firstChild.textContent=n}}
+function roll(n,forced){if(rolling)return;if(n)setDie(n);const s=SIDES,res=forced||rnd(s);rolling=true;const die=$("die"),sp=die.firstChild;die.className="";void die.offsetWidth;
+  const quick=matchMedia("(prefers-reduced-motion: reduce)").matches;if(started&&!paused)SYN.dice();$("dres").className="";$("dres").textContent="Rolling a d"+s+"…";
+  if(!quick)die.classList.add("rolling");let i=0;const iv=setInterval(()=>{sp.textContent=rnd(s);if(++i>=8||quick){clearInterval(iv);finish()}},80);
+  function finish(){rolling=false;sp.textContent=res;die.classList.remove("rolling");const nat20=s===20&&res===20,nat1=s===20&&res===1;die.classList.toggle("nat20",nat20);die.classList.toggle("nat1",nat1);
+    let txt="You rolled "+res+" on a d"+s+".";const dr=$("dres");dr.className=nat20?"crit":nat1?"fumble":"";
+    if(nat20)txt="NATURAL 20! You rolled 20.";if(nat1)txt="Natural 1. You rolled 1.";
+    if($("drive").checked&&(nat20||nat1)){if(started){txt+=nat20?" The music answers: Critical Hit.":" The music answers: Something Moves.";moment(nat20?"crit":"moves")}else txt+=" (Begin the session and the music will answer.)"}
+    dr.textContent=txt;hist.unshift("d"+s+":"+res);hist.length=Math.min(hist.length,6);$("dhist").textContent="Recent: "+hist.join(" · ");window.__lastRoll={s,res}}}
+/* ---------- UI ---------- */
+function fill(r){r.style.setProperty("--p",((r.value-r.min)/(r.max-r.min)*100)+"%")}
+function nowText(){const n=SCMAP[cur]?SCMAP[cur].name:curMix?curMix:Object.values(S).some(s=>s.on)?"Custom mix":"Silence";return n+" · "+band(INT)}
+let lastMeta="";
+function ui(){const b=band(INT);$("intensity").value=INT;fill($("intensity"));$("intensity").setAttribute("aria-valuetext",INT+", "+b);$("bandname").textContent=b.toUpperCase()+" · "+INT;
+  document.querySelectorAll("#bands button").forEach(x=>x.classList.toggle("act",x.dataset.b===b));
+  document.querySelectorAll(".scene").forEach(x=>{const a=x.dataset.id===cur;x.classList.toggle("act",a);x.setAttribute("aria-pressed",a)});
+  const s=SCMAP[cur];$("flavor").innerHTML=s?`<b>${s.name.toUpperCase()}</b><em>${s.flavor}</em>`:curMix?`<b>${esc(curMix).toUpperCase()}</b><em>One of your saved mixes.</em>`:$("flavor").innerHTML;
+  const nt=nowText();$("nowlabel").textContent=started?nt:"Not started · tap Begin";
+  document.body.classList.toggle("paused",paused);$("pausedbar").hidden=!paused;$("pause").textContent=paused?"▶ RESUME":"❚❚ PAUSE";$("pause").setAttribute("aria-pressed",paused);
+  document.title=(started?(paused?"❚❚ ":"▶ "):"")+nt+" · Dead Echoes GM Mixer";
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("act",c.dataset.n===curMix));
+  if(started&&"mediaSession"in navigator){const m=nt+(paused?"p":"");if(m!==lastMeta){lastMeta=m;try{navigator.mediaSession.metadata=new MediaMetadata({title:s?s.name:(curMix||"Custom mix"),artist:"Dead Echoes · "+b+" ("+INT+")",album:"Dojo Studios GM Mixer",artwork:[{src:"img/cover-512.jpg",sizes:"512x512",type:"image/jpeg"}]});navigator.mediaSession.playbackState=paused?"paused":"playing"}catch(e){}}}
+  window.__np=$("nowlabel").textContent}
+function mediaSetup(){if(!("mediaSession"in navigator))return;const ms=navigator.mediaSession,h=(a,f)=>{try{ms.setActionHandler(a,f)}catch(e){}};
+  const step=d=>{const i=SCN.findIndex(s=>s.id===cur);setScene(SCN[(i+d+SCN.length)%SCN.length].id)};
+  h("play",resume);h("pause",pause);h("stop",pause);h("nexttrack",()=>step(1));h("previoustrack",()=>step(-1))}
+function toast(t,d){const box=$("toasts"),el=document.createElement("div");el.className="toast";el.innerHTML=`<b>${esc(t)}</b>${d?esc(d):""}`;box.append(el);while(box.children.length>1)box.firstChild.remove();setTimeout(()=>{el.classList.add("out");setTimeout(()=>el.remove(),320)},2600)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+/* build DOM */
+SCN.forEach((s,i)=>{const b=document.createElement("button");b.className="scene";b.dataset.id=s.id;b.innerHTML=`${svg(s.id)}<b>${s.name.toUpperCase()}</b><span>${s.desc}</span><kbd>${i+1}</kbd>`;b.onclick=()=>{if(!started){cur=s.id;begin();return}if(paused){setScene(s.id);toast(s.name+" queued","Still paused. Tap Resume when ready.");return}setScene(s.id)};$("scenes").append(b)});
+BANDS.forEach(([n,,,v])=>{const b=document.createElement("button");b.textContent=n.toUpperCase();b.dataset.b=n;b.onclick=()=>{setInt(v,1.2);if(started)toast("Intensity · "+n,v+"")};$("bands").append(b)});
+for(const id in MOM){const m=MOM[id],b=document.createElement("button");b.className="mom"+(m.wide?" wide":"");b.dataset.m=id;b.innerHTML=`${svg(id)}<b>${m.name.toUpperCase()}</b><span>${m.desc}</span>`;b.onclick=()=>moment(id);$("moms").append(b)}
+[4,6,8,10,12,20].forEach(n=>{const b=document.createElement("button");b.textContent="D"+n;b.dataset.s=n;b.setAttribute("aria-label","d"+n);b.onclick=()=>setDie(n);$("dtypes").append(b)});
+$("roll").onclick=()=>roll();
+L.forEach(([k,n,d])=>{const r=document.createElement("div");r.className="row";r.innerHTML=`<button class="tg" aria-label="Toggle ${n}">♪</button><div><b>${n.toUpperCase()}</b> <small>${d}</small><em hidden>AUTO</em><input type="range" min="0" max="1" step="0.01" value="0.7" aria-label="${n} volume"><div class="meter"><i></i></div></div>`;$("layers").append(r);S[k].row=r;
+  r.querySelector(".tg").onclick=()=>{S[k].on=!S[k].on;if(!started){cur=null;begin()}apply(k,.4);ui()};r.querySelector("input").oninput=e=>{S[k].vol=+e.target.value;if(!S[k].on){S[k].on=true}apply(k);ui()}});
+$("begin").onclick=begin;$("pause").onclick=togglePause;
+$("master").oninput=e=>{fill(e.target);$("mval").value=Math.round(e.target.value*100);if(master)master.gain.setTargetAtTime(+e.target.value,ctx.currentTime,.05)};fill($("master"));
 $("intensity").oninput=e=>setInt(+e.target.value);
-function victory(){if(sting)return;if(!ctx)init();const b={};if(!Object.values(S).some(s=>s.on)){S.combat.on=true;S.combat.vol=.6}if(S.combat.on)b.combat=.9;if(!S.combat.on){/* swell existing layers only */}
-sting=b;$("sting").disabled=true;for(const k in S)apply(k,.6);setTimeout(()=>{sting=null;for(const k in S)apply(k,1.2);setTimeout(()=>{$("sting").disabled=false},1200)},1800)}
-$("sting").onclick=victory;
-document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT"&&e.target.type!=="range"||e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key.toLowerCase();
-if(k==="1")scene("Calm");else if(k==="2")scene("Tension");else if(k==="3")scene("Combat");else if(k==="v")victory();else if(k==="[")setInt(INT-10,.5);else if(k==="]")setInt(INT+10,.5);else if(k===" "&&!ctx){e.preventDefault();$("start").click()}});
-for(const n in P){const b=document.createElement("button");b.textContent=n.toUpperCase();b.onclick=()=>load(P[n]);$("presets").append(b)}
-const KEY="deadEchoesMixes";const get=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}};
-function draw(){const m=get();$("mixes").innerHTML="";for(const n in m){const b=document.createElement("button");b.className="";b.style.cssText="font:10px P,monospace;padding:12px 10px;background:#241f2e;color:#9fd8e0;border:3px solid #2fa3b3";b.textContent=n+" ✕";b.title="Tap to load, long-press/✕ via confirm to delete";b.onclick=()=>{if(confirm('Load "'+n+'"? (Cancel to delete)'))load(m[n]);else if(confirm('Delete "'+n+'"?')){delete m[n];localStorage.setItem(KEY,JSON.stringify(m));draw()}};$("mixes").append(b)}}
-$("savebtn").onclick=()=>{const n=$("mixname").value.trim()||"Mix "+(Object.keys(get()).length+1);const mix={};for(const k in S)if(S[k].on)mix[k]=S[k].vol;const m=get();m[n]=mix;localStorage.setItem(KEY,JSON.stringify(m));$("mixname").value="";draw()};draw();
+const DKEY="deadEchoesDrive";$("drive").checked=localStorage.getItem(DKEY)==="1";$("drive").onchange=e=>{try{localStorage.setItem(DKEY,e.target.checked?"1":"0")}catch(x){}toast(e.target.checked?"Dice drive the music":"Dice are just dice",e.target.checked?"Nat 20 fires Critical Hit, nat 1 fires Something Moves.":"Rolls no longer touch the music.")};
+document.addEventListener("keydown",e=>{const tg=e.target;if((tg.tagName==="INPUT"&&tg.type!=="range"&&tg.type!=="checkbox")||e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key.toLowerCase();
+  if(k===" "){if(!started){e.preventDefault();begin()}return}
+  if(k>="1"&&k<="6"){const s=SCN[+k-1];if(!started){cur=s.id;begin()}else setScene(s.id)}
+  else if(k==="["||k==="]"){setInt(INT+(k==="["?-10:10),.5);if(started)toast("Intensity · "+band(INT),INT+"")}
+  else if(k==="p"){if(started)togglePause();else begin()}
+  else if(k==="d")roll(20);
+  else{const id=Object.keys(MOM).find(m=>MOM[m].key.toLowerCase()===k);if(id)moment(id)}});
+/* ---------- My Mixes (same localStorage key and format as v1; extra _i/_s keys are ignored by v1) ---------- */
+const KEY="deadEchoesMixes";const get=()=>{try{const m=JSON.parse(localStorage.getItem(KEY));return m&&typeof m==="object"?m:{}}catch(e){return{}}};
+function loadMix(n){const m=get()[n];if(!m)return;cancelMoments();for(const k in S){S[k].on=k in m;if(k in m)S[k].vol=+m[k]}
+  if(typeof m._i==="number")INT=m._i;cur=null;curMix=n;if(!started)begin();else applyAll(2);ui();toast("Loaded mix",n+" · "+band(INT))}
+function draw(){const m=get(),box=$("mixes");box.innerHTML="";const names=Object.keys(m);$("nomix").hidden=names.length>0;
+  names.forEach(n=>{const c=document.createElement("div");c.className="chip";c.dataset.n=n;const a=document.createElement("button"),x=document.createElement("button");a.textContent=n.toUpperCase();a.onclick=()=>loadMix(n);
+    x.textContent="✕";x.setAttribute("aria-label","Delete mix "+n);x.onclick=()=>{if(confirm('Delete "'+n+'"?')){const mm=get();delete mm[n];localStorage.setItem(KEY,JSON.stringify(mm));draw();toast("Deleted",n)}};c.append(a,x);box.append(c)});ui()}
+$("savebtn").onclick=()=>{const n=$("mixname").value.trim()||(SCMAP[cur]?SCMAP[cur].name+" ":"Mix ")+(Object.keys(get()).length+1);const mix={};for(const k in S)if(S[k].on)mix[k]=S[k].vol;mix._i=INT;if(cur)mix._s=cur;
+  const m=get();m[n]=mix;try{localStorage.setItem(KEY,JSON.stringify(m))}catch(e){toast("Could not save","This browser blocked local storage.");return}$("mixname").value="";curMix=n;cur=null;draw();toast("Mix saved",n)};
+$("mixname").onkeydown=e=>{if(e.key==="Enter")$("savebtn").click()};
 const KOFI_URL="";/* TODO: set Ko-fi URL; button stays hidden while empty */
 if(KOFI_URL){$("kofi").href=KOFI_URL;$("kofi").target="_blank";$("kofi").rel="noopener";$("kofi").textContent="☕ Tip on Ko-fi"}else{$("kofi").hidden=true}
+setDie(SIDES);draw();ui();
+/* test/debug hook (read-only) */
+window.__de={targets(){const o={};for(const k in S)o[k]=target(k);return o},gains(){const o={};for(const k in S)o[k]=S[k].g?+S[k].g.gain.value.toFixed(3):null;return o},
+ state(){return{started,paused,cur,INT,band:band(INT),curMix,ovl,busyMom,ctx:ctx&&ctx.state,bus:bus&&+bus.gain.value.toFixed(3),pg:pg&&+pg.gain.value.toFixed(3),master:master&&+master.gain.value.toFixed(3),loaded}},roll};
 </script></body></html>
